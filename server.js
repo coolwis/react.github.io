@@ -19,24 +19,31 @@ const connection = mysql.createConnection({
     database: conf.database
 });
 connection.connect();
+console.log (">>>> mysql connect state:" + connection.state);
 
 const multer = require('multer');
 const upload = multer({dest: './upload'})
 
 app.get('/api/customers', (req, res) => {
+    console.log(">>> call /api/cutomers..");
+
     connection.query(
       "SELECT * FROM CUSTOMER WHERE isDeleted = 0",
       (err, rows, fields) => {
           res.send(rows);
+
+          console.log(">>> send Ok /api/cutomers..");
       }  
     );
+
+    console.log(">>> end /api/cutomers..");
 });
 
 app.use('/image', express.static('./upload'));
 
 app.post('/api/customers', upload.single('image'), (req, res) => {
     let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?, now(), 0)';
-    let image = '/image/' + req.file.filename;
+    let image = '/back-end/upload/' + req.file.filename;
     let name = req.body.name;
     let birthday = req.body.birthday;
     let gender = req.body.gender;
